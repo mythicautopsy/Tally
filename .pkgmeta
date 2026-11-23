@@ -1,0 +1,7 @@
+package-as: Tally
+
+ignore:
+  - .github
+  - Tally-logo-400.png
+  - Tally-summary.md
+  - CLAUDE.md

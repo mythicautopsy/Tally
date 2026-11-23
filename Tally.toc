@@ -1,0 +1,14 @@
+## Interface: 16001
+## Title: Tally
+## Notes: A gold ledger: where every copper came from and went, by category and time range.
+## Author: mythicautopsy - The Monsoon Brigade @ Alliance PVE
+## Version: 1.0.0
+## SavedVariables: TallyDB
+## X-Category: Auction & Economy
+## X-Website: https://github.com/mythicautopsy/Tally
+## X-License: MIT
+## IconTexture: Interface\Icons\INV_Misc_Coin_02
+
+Core.lua
+Ledger.lua
+UI.lua
