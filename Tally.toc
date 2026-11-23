@@ -8,6 +8,7 @@
 ## X-Website: https://github.com/mythicautopsy/Tally
 ## X-License: MIT
 ## IconTexture: Interface\Icons\INV_Misc_Coin_02
+## X-Curse-Project-ID: 1825898
 
 Core.lua
 Ledger.lua
