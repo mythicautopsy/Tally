@@ -21,3 +21,38 @@ jobs:
       - uses: BigWigsMods/packager@v2
         with:
           args: -n "{package-name}-{project-version}-forever"
+
+      - name: Announce release on Discord
+        env:
+          DISCORD_RELEASE_WEBHOOK: ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
+        run: |
+          if [ -z "$DISCORD_RELEASE_WEBHOOK" ]; then
+            echo "DISCORD_RELEASE_WEBHOOK secret not set, skipping announcement."
+            exit 0
+          fi
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${TAG#v}"
+          BASE="${VERSION%%-*}"
+          ADDON="${GITHUB_REPOSITORY#*/}"
+          case "$VERSION" in
+            *alpha*) TYPE="alpha" ;;
+            *beta*) TYPE="beta" ;;
+            *) TYPE="release" ;;
+          esac
+          # Release notes: the "## <version>" section of CHANGELOG.md, if there is one
+          NOTES=""
+          if [ -f CHANGELOG.md ]; then
+            NOTES=$(awk -v v="$BASE" 'BEGIN{gsub(/\./,"\\.",v); re="^## \\[?v?" v "([] (]|$)"} /^## /{ if (found) exit; if ($0 ~ re) { found = 1; next } } found' CHANGELOG.md)
+          fi
+          jq -n --arg addon "$ADDON" --arg version "$VERSION" --arg type "$TYPE" --arg notes "$NOTES" '{
+            username: "Release Feed",
+            embeds: [{
+              title: $addon,
+              description: (if ($notes | gsub("\\s"; "")) == "" then "(no notes)" else ($notes | .[0:3500]) end),
+              fields: [
+                { name: "version", value: $version, inline: true },
+                { name: "type", value: $type, inline: true }
+              ]
+            }]
+          }' > discord-payload.json
+          curl -sSf -H "Content-Type: application/json" -d @discord-payload.json "$DISCORD_RELEASE_WEBHOOK"
